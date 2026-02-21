@@ -23,16 +23,14 @@ class ChatRequest(BaseModel):
 
 @app.post("/chat")
 def chat(req: ChatRequest):
-    # Save user message
     save_message("user", req.message)
 
-    # Get AI reply
-    reply = get_ai_response(req.message)
+    ai_response = get_ai_response(req.message)
+    reply_text = ai_response["reply"]
 
-    # Save assistant reply
-    save_message("assistant", reply)
+    save_message("assistant", reply_text)
 
-    return {"reply": reply}
+    return {"reply": reply_text}
 
 
 @app.get("/messages")
@@ -40,18 +38,29 @@ def get_messages():
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute(
-        "SELECT role, content FROM messages ORDER BY id ASC"
-    )
+    cursor.execute("""
+        SELECT role, content, timestamp
+        FROM messages
+        ORDER BY id ASC
+    """)
+    
     rows = cursor.fetchall()
-
     conn.close()
 
-    # Convert rows to JSON format
     return [
         {
             "role": row["role"],
-            "content": row["content"]
+            "content": row["content"],
+            "timestamp": row["timestamp"]
         }
         for row in rows
     ]
+
+@app.delete("/messages")
+def clear_messages():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM messages")
+    conn.commit()
+    conn.close()
+    return {"status": "Chat cleared"}
