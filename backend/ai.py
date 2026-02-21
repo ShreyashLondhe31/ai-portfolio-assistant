@@ -8,15 +8,11 @@ API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 context = """
 You are an AI assistant for Shreyash Londhe's portfolio.
-Answer questions about his skills, projects, and experience.
-Be concise and professional.
+Answer professionally about his skills, projects, and experience.
+Keep answers concise and impressive for recruiters.
 """
 
-def get_ai_response(user_message: str):
-    if not API_KEY:
-        print("OPENROUTER KEY MISSING")
-        return {"reply": "AI key not configured."}
-
+def get_ai_response(user_message: str) -> str:
     try:
         response = requests.post(
             "https://openrouter.ai/api/v1/chat/completions",
@@ -24,7 +20,7 @@ def get_ai_response(user_message: str):
                 "Authorization": f"Bearer {API_KEY}",
                 "Content-Type": "application/json",
                 "HTTP-Referer": "https://ai-portfolio-assistant-peach.vercel.app",
-                "X-Title": "Shreyash Portfolio AI",
+                "X-Title": "Shreyash Portfolio"
             },
             json={
                 "model": "deepseek/deepseek-chat",
@@ -39,14 +35,10 @@ def get_ai_response(user_message: str):
         print("STATUS:", response.status_code)
         print("TEXT:", response.text)
 
-        if response.status_code != 200:
-            return {"reply": "AI service error."}
-
         data = response.json()
-        ai_text = data["choices"][0]["message"]["content"]
 
-        return {"reply": ai_text}
+        return data["choices"][0]["message"]["content"]
 
     except Exception as e:
-        print("OPENROUTER ERROR:", str(e))
-        return {"reply": "Error connecting to AI"}
+        print("AI ERROR:", str(e))
+        return "Error connecting to AI"

@@ -20,15 +20,15 @@ class ChatRequest(BaseModel):
 
 @app.post("/chat")
 def chat(req: ChatRequest):
-    # Save user message
+    # save user msg
     save_message("user", req.message)
 
-    reply = get_ai_response(req.message)
+    ai_reply = get_ai_response(req.message)
 
-    # Save assistant reply
-    save_message("assistant", reply)
+    # save assistant msg
+    save_message("assistant", ai_reply)
 
-    return {"reply": reply}
+    return {"reply": ai_reply}
 
 @app.get("/messages")
 def get_messages():
