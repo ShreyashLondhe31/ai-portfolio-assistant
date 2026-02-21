@@ -68,20 +68,23 @@ export default function ChatWidget() {
 
   useEffect(() => {
     if (isOpen) {
-      loadMessages();
+      // Clear backend chat history
+      fetch("https://ai-portfolio-backend-v8f1.onrender.com/messages", {
+        method: "DELETE"
+      }).catch(() => { });
+
+      // Reset local UI messages
+      setMessages([
+        {
+          role: "assistant",
+          content:
+            "Hi! I'm Shreyash's AI assistant. Ask me anything about his skills or projects.",
+        },
+      ]);
+
       setTimeout(() => inputRef.current?.focus(), 300);
     }
   }, [isOpen]);
-
-  const loadMessages = async () => {
-    try {
-      const res = await fetch("https://ai-portfolio-backend-v8f1.onrender.com/messages");
-      const data = await res.json();
-      setMessages(data);
-    } catch {
-      console.log("Failed to load messages");
-    }
-  };
 
   return (
     <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-2">

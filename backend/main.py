@@ -57,6 +57,7 @@ def get_messages():
 
 @app.delete("/messages")
 def clear_messages():
+    from db import get_connection
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("DELETE FROM messages")
