@@ -20,22 +20,10 @@ class ChatRequest(BaseModel):
 
 @app.post("/chat")
 def chat(req: ChatRequest):
-    # save user msg
     save_message("user", req.message)
 
-    ai_reply = get_ai_response(req.message)
+    reply_text = get_ai_response(req.message)
 
-    # save assistant msg
-    save_message("assistant", ai_reply)
+    save_message("assistant", reply_text)
 
-    return {"reply": ai_reply}
-
-@app.get("/messages")
-def get_messages():
-    from db import get_connection
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM messages ORDER BY id DESC")
-    rows = cursor.fetchall()
-    conn.close()
-    return [dict(row) for row in rows]
+    return {"reply": reply_text}
