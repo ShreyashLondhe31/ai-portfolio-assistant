@@ -1,0 +1,41 @@
+{
+  "name": "Shreyash Londhe",
+  "education": {
+    "degree": "Master of Computer Applications (MCA)",
+    "status": "Final Semester",
+    "cgpa": "9.00"
+  },
+  "skills": {
+    "frontend": ["React", "TypeScript", "TailwindCSS"],
+    "backend": ["Python", "FastAPI","RestAPI", "Django", "DjangoRestFramework", "Node.js"],
+    "database": ["Postgres", "MySQL","MongoDB"],
+    "other": ["Git", "REST APIs", "AI Integration", "OpenRouter API"]
+  },
+  "projects": [
+    {
+      "name": "AI Portfolio Assistant",
+      "description": "Full stack AI-powered portfolio using React, TypeScript, FastAPI and OpenRouter.",
+      "features": [
+        "Chat interface with AI",
+        "Backend context-based responses",
+        "Deployed full-stack architecture"
+      ]
+    },
+    {
+      "name": "Hakimi Establishment Website",
+      "description": "Business website with modern UI and responsive design.",
+      "features": [
+        "Responsive layout",
+        "Professional UI design",
+        "Client-oriented development"
+      ]
+    }
+  ],
+  "strengths": [
+    "Strong problem solving",
+    "Clean backend architecture design",
+    "Focus on scalable systems",
+    "Interest in AI-powered applications"
+  ],
+  "career_goal": "To become a strong full-stack engineer specializing in AI-powered applications and scalable backend systems."
+}
