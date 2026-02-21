@@ -67,8 +67,21 @@ export default function ChatWidget() {
   }, [messages, loading]);
 
   useEffect(() => {
-    if (isOpen) setTimeout(() => inputRef.current?.focus(), 300);
+    if (isOpen) {
+      loadMessages();
+      setTimeout(() => inputRef.current?.focus(), 300);
+    }
   }, [isOpen]);
+
+  const loadMessages = async () => {
+    try {
+      const res = await fetch("https://ai-portfolio-backend-v8f1.onrender.com/messages");
+      const data = await res.json();
+      setMessages(data);
+    } catch {
+      console.log("Failed to load messages");
+    }
+  };
 
   return (
     <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-2">

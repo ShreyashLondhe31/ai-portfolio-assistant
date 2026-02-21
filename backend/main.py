@@ -25,8 +25,7 @@ class ChatRequest(BaseModel):
 def chat(req: ChatRequest):
     save_message("user", req.message)
 
-    ai_response = get_ai_response(req.message)
-    reply_text = ai_response["reply"]
+    reply_text = get_ai_response(req.message)  # already string
 
     save_message("assistant", reply_text)
 
@@ -63,4 +62,4 @@ def clear_messages():
     cursor.execute("DELETE FROM messages")
     conn.commit()
     conn.close()
-    return {"status": "Chat cleared"}
+    return {"status": "cleared"}
