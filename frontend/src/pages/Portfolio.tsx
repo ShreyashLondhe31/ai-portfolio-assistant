@@ -248,7 +248,7 @@ export default function Portfolio() {
 
                                 {/* LINKEDIN */}
                                 <a
-                                    href="https://linkedin.com/in/YOUR_LINK"
+                                    href="https://www.linkedin.com/in/shreyashlondhe/"
                                     target="_blank"
                                     className="border border-white/10 px-6 py-3 rounded-xl hover:bg-white/5 transition"
                                 >
