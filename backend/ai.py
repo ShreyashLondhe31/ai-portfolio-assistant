@@ -23,9 +23,7 @@ Answer ONLY using this data:
             "https://openrouter.ai/api/v1/chat/completions",
             headers={
                 "Authorization": f"Bearer {API_KEY}",
-                "Content-Type": "application/json",
-                "HTTP-Referer": "http://localhost:5173",
-                "X-Title": "AI Portfolio"
+                "Content-Type": "application/json"
             },
             json={
                 "model": "deepseek/deepseek-chat",
