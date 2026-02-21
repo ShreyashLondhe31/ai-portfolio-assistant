@@ -6,38 +6,30 @@ load_dotenv()
 
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 
-SYSTEM_CONTEXT = """
-You are Shreyash Londhe's AI portfolio assistant.
-
-Answer questions about:
-- Skills
-- Projects
-- Experience
-- Tech stack
-- Internship suitability
-
-Keep answers concise, professional and recruiter-friendly.
+context = """
+You are an AI assistant for Shreyash Londhe's portfolio.
+Answer questions about his skills, projects, and experience.
+Be concise and professional.
 """
 
 def get_ai_response(user_message: str):
-    try:
-        # check key
-        if not API_KEY:
-            print("ERROR: OPENROUTER_API_KEY missing")
-            return {"reply": "AI service not configured."}
+    if not API_KEY:
+        print("OPENROUTER KEY MISSING")
+        return {"reply": "AI key not configured."}
 
+    try:
         response = requests.post(
             "https://openrouter.ai/api/v1/chat/completions",
             headers={
                 "Authorization": f"Bearer {API_KEY}",
                 "Content-Type": "application/json",
                 "HTTP-Referer": "https://ai-portfolio-assistant-peach.vercel.app",
-                "X-Title": "Shreyash Portfolio AI"
+                "X-Title": "Shreyash Portfolio AI",
             },
             json={
                 "model": "deepseek/deepseek-chat",
                 "messages": [
-                    {"role": "system", "content": SYSTEM_CONTEXT},
+                    {"role": "system", "content": context},
                     {"role": "user", "content": user_message}
                 ]
             },
@@ -45,22 +37,16 @@ def get_ai_response(user_message: str):
         )
 
         print("STATUS:", response.status_code)
-        print("RAW RESPONSE:", response.text)
+        print("TEXT:", response.text)
 
-        # if OpenRouter fails
         if response.status_code != 200:
-            return {"reply": "AI service error. Please try again."}
+            return {"reply": "AI service error."}
 
         data = response.json()
+        ai_text = data["choices"][0]["message"]["content"]
 
-        # safety checks
-        if "choices" not in data:
-            print("INVALID RESPONSE:", data)
-            return {"reply": "AI returned invalid response."}
-
-        reply = data["choices"][0]["message"]["content"]
-        return {"reply": reply}
+        return {"reply": ai_text}
 
     except Exception as e:
-        print("OPENROUTER CRASH:", str(e))
+        print("OPENROUTER ERROR:", str(e))
         return {"reply": "Error connecting to AI"}
