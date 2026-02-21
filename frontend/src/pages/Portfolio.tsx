@@ -1,69 +1,6 @@
-import { motion } from "framer-motion";
 import ChatWidget from "../components/ChatWidget";
 import Navbar from "../components/Navbar";
-import {
-    Github,
-    Linkedin,
-    Mail,
-    ExternalLink,
-    Code2,
-    Server,
-    Brain,
-    Layers,
-    ArrowRight,
-} from "lucide-react";
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
-
-const techBadges = ["React", "TypeScript", "Python", "FastAPI", "Node.js", "TailwindCSS"];
-
-const strengths = [
-    { icon: Code2, label: "Frontend", desc: "React · TypeScript · TailwindCSS" },
-    { icon: Server, label: "Backend", desc: "FastAPI · Node.js · REST APIs" },
-    { icon: Brain, label: "AI / ML", desc: "LLM Integration · OpenRouter" },
-    { icon: Layers, label: "Architecture", desc: "Full-stack system design" },
-];
-
-const projects = [
-    {
-        title: "AI Portfolio Assistant",
-        description:
-            "Full-stack portfolio with an embedded AI chat assistant. Streams responses via OpenRouter and renders them in a custom glassmorphism chat UI built with React and FastAPI.",
-        tags: ["React", "FastAPI", "OpenRouter", "TypeScript", "TailwindCSS"],
-        github: "https://github.com/shreyashlondhe",
-        live: "#",
-    },
-    {
-        title: "Hakimi Establishment Website",
-        description:
-            "Professional business website with responsive layout, smooth scroll animations, and a modern UI. Optimised for performance and cross-device compatibility.",
-        tags: ["React", "TailwindCSS", "Framer Motion"],
-        github: "https://github.com/shreyashlondhe",
-        live: "#",
-    },
-];
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-const ease = [0.22, 1, 0.36, 1] as const;
-
-/** Animate-on-mount fade+slide */
-const fadeUp = (delay = 0) => ({
-    initial: { opacity: 0, y: 24 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.55, delay, ease },
-});
-
-/** Animate-on-scroll fade+slide */
-const fadeUpView = (delay = 0) => ({
-    initial: { opacity: 0, y: 24 },
-    whileInView: { opacity: 1, y: 0 },
-    viewport: { once: true, margin: "-60px" },
-    transition: { duration: 0.55, delay, ease },
-});
-
-const scrollTo = (id: string) =>
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
 // ─── Component ────────────────────────────────────────────────────────────────
 

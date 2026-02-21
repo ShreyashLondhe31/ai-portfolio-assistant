@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Portfolio from "./pages/Portfolio";
-import NotFound from "./pages/Notfound";
+import NotFound from "./pages/NotFound";
 import Loader from "./components/Loader";
 
 export default function App() {
