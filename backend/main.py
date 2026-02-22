@@ -7,26 +7,14 @@ from db import init_db, save_message, get_connection
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from slowapi.middleware import SlowAPIMiddleware
-from starlette.middleware.base import BaseHTTPMiddleware
 from slowapi.errors import RateLimitExceeded
 from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
 
 app = FastAPI()
 init_db()
 
-# ---------------- RATE LIMIT SETUP ----------------
-limiter = Limiter(key_func=get_remote_address)
-app.state.limiter = limiter
-app.add_middleware(SlowAPIMiddleware)
-
-@app.exception_handler(RateLimitExceeded)
-def rate_limit_handler(request: Request, exc: RateLimitExceeded):
-    return JSONResponse(
-        status_code=429,
-        content={"reply": "Too many requests. Slow down."}
-    )
-
-# ---------------- CORS ----------------
+# ---------------- CORS FIRST ----------------
 origins = [
     "http://localhost:5173",
     "https://ai-portfolio-assistant-peach.vercel.app",
@@ -40,8 +28,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ---------------- RATE LIMIT ----------------
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
 
-# SECURITY HEADERS
+app.add_middleware(SlowAPIMiddleware)
+
+@app.exception_handler(RateLimitExceeded)
+def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    return JSONResponse(
+        status_code=429,
+        content={"reply": "Too many requests. Slow down."}
+    )
+
+# ---------------- SECURITY HEADERS ----------------
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
         response = await call_next(request)
@@ -57,16 +57,15 @@ app.add_middleware(SecurityHeadersMiddleware)
 class ChatRequest(BaseModel):
     message: str
 
-# ---------------- CHAT ENDPOINT ----------------
+# ---------------- CHAT ----------------
 @app.post("/chat")
-@limiter.limit("10/minute") 
-def chat(req: ChatRequest, request: Request):
+@limiter.limit("10/minute")
+def chat(request: Request, req: ChatRequest):
     user_message = req.message
 
     save_message("user", user_message)
 
     ai_response = get_ai_response(user_message)
-
     reply_text = ai_response["reply"]
 
     save_message("assistant", reply_text)
