@@ -79,12 +79,6 @@ export default function ChatWidget() {
 
   useEffect(() => {
     if (isOpen) {
-      // Clear backend chat history
-      fetch("https://ai-portfolio-backend-v8f1.onrender.com/messages", {
-        method: "DELETE"
-      }).catch(() => { });
-
-      // Reset local UI messages
       setMessages([
         {
           role: "assistant",
