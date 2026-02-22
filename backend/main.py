@@ -14,7 +14,19 @@ from starlette.middleware.base import BaseHTTPMiddleware
 app = FastAPI()
 init_db()
 
-# ---------------- CORS FIRST ----------------
+# ---------- RATE LIMIT ----------
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_middleware(SlowAPIMiddleware)
+
+@app.exception_handler(RateLimitExceeded)
+def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    return JSONResponse(
+        status_code=429,
+        content={"reply": "Too many requests. Slow down."}
+    )
+
+# ---------- CORS ----------
 origins = [
     "http://localhost:5173",
     "https://ai-portfolio-assistant-peach.vercel.app",
@@ -28,20 +40,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ---------------- RATE LIMIT ----------------
-limiter = Limiter(key_func=get_remote_address)
-app.state.limiter = limiter
-
-app.add_middleware(SlowAPIMiddleware)
-
-@app.exception_handler(RateLimitExceeded)
-def rate_limit_handler(request: Request, exc: RateLimitExceeded):
-    return JSONResponse(
-        status_code=429,
-        content={"reply": "Too many requests. Slow down."}
-    )
-
-# ---------------- SECURITY HEADERS ----------------
+# ---------- SECURITY HEADERS ----------
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
         response = await call_next(request)
