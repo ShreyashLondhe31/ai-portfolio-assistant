@@ -41,13 +41,24 @@ export default function ChatWidget() {
       );
 
       const data = await res.json();
-      const cleaned = data.reply
-        .replace(/\*\*/g, "")
-        .replace(/\\n/g, "\n");
+
+      let cleaned = data.reply || "";
+
+      // remove markdown bold
+      cleaned = cleaned.replace(/\*\*/g, "");
+
+      // fix escaped new lines
+      cleaned = cleaned.replace(/\\n/g, "\n");
+
+      // remove weird spacing
+      cleaned = cleaned.replace(/\n{3,}/g, "\n\n");
+
+      // trim
+      cleaned = cleaned.trim();
 
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: cleaned },
+        { role: "assistant", content: cleaned }
       ]);
     } catch {
       setMessages((prev) => [
