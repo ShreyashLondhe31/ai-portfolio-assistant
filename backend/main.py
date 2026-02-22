@@ -27,9 +27,14 @@ def rate_limit_handler(request: Request, exc: RateLimitExceeded):
     )
 
 # ---------------- CORS ----------------
+origins = [
+    "http://localhost:5173",
+    "https://ai-portfolio-assistant-peach.vercel.app",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://ai-portfolio-assistant-peach.vercel.app/", "http://localhost:5173"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
