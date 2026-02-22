@@ -62,14 +62,24 @@ class ChatRequest(BaseModel):
 def chat(request: Request, req: ChatRequest):
     user_message = req.message
 
-    save_message("user", user_message)
+    try:
+        save_message("user", user_message)
 
-    ai_response = get_ai_response(user_message)
-    reply_text = ai_response["reply"]
+        ai_response = get_ai_response(user_message)
 
-    save_message("assistant", reply_text)
+        # SAFE PARSE
+        if isinstance(ai_response, dict) and "reply" in ai_response:
+            reply_text = ai_response["reply"]
+        else:
+            reply_text = str(ai_response)
 
-    return {"reply": reply_text}
+        save_message("assistant", reply_text)
+
+        return {"reply": reply_text}
+
+    except Exception as e:
+        print("CHAT ERROR:", e)
+        return {"reply": "Server error. Try again."}
 
 # ---------------- GET MESSAGES ----------------
 @app.get("/messages")
