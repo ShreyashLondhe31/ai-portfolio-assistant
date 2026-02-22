@@ -1,5 +1,6 @@
 import ChatWidget from "../components/ChatWidget";
 import Navbar from "../components/Navbar";
+import TopIntroBar from "../components/TopIntroBar";
 
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -12,12 +13,13 @@ export default function Portfolio() {
 
             <div className="relative">
                 <Navbar />
+                <TopIntroBar />
 
                 {/* ══════════════════════════
           HERO — two-column split
       ══════════════════════════ */}
-                <section className="min-h-[90vh] flex items-center pt-24">
-                    <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-10 items-center px-6 pt-24">
+                <section className="min-h-[65vh] flex items-center pt-24 md:pt-28">
+                    <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-10 items-center px-6">
 
                         {/* LEFT SIDE */}
                         <div>
