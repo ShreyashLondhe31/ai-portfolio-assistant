@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Briefcase, Brain, Code2, MapPin } from "lucide-react";
+import { Briefcase, Code2, MapPin } from "lucide-react";
 
 export default function TopIntroBar() {
     return (
