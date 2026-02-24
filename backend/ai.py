@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 API_KEY = os.getenv("OPENROUTER_API_KEY")
+MODEL= os.getenv("MODEL")
 
 # Load resume context
 with open("resume.json", "r", encoding="utf-8") as f:
@@ -25,7 +26,7 @@ def get_ai_response(user_message: str) -> str:
                 "X-Title": "Shreyash Portfolio Assistant"
             },
             json={
-                "model": "openai/gpt-3.5-turbo",
+                "model": MODEL,
                 "messages": [
                     {
                         "role": "system",
