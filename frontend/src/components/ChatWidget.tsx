@@ -32,7 +32,7 @@ export default function ChatWidget() {
 
     try {
       const res = await fetch(
-        "https://ai-portfolio-backend-v8f1.onrender.com/chat",
+        "http://127.0.0.1:8000/chat",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
