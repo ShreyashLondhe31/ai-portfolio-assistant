@@ -246,7 +246,7 @@ export default function ChatWidget() {
               </div>
 
               <p className="text-center text-gray-500 text-[10px] mt-2">
-                Powered by OpenRouter
+                Powered by GroqCloud
               </p>
             </div>
           </motion.div>
