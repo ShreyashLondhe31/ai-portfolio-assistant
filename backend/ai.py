@@ -51,10 +51,15 @@ def get_ai_response(user_message: str):
                 {"role": "user", "content": user_message}
             ]
         )
+        print(completion)
 
-        reply = completion.choices[0].message.content.strip()
+        # SAFE extraction
+        reply = completion.choices[0].message.content
 
-        return {"reply": reply}
+        if not reply:
+            return {"reply": "AI returned empty response."}
+
+        return {"reply": reply.strip()}
 
     except Exception as e:
         print("AI ERROR:", str(e))
