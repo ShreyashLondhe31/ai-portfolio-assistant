@@ -153,12 +153,12 @@ export default function Portfolio() {
                                 <h3 className="text-xl font-semibold">AI Portfolio Assistant</h3>
 
                                 <p className="text-gray-400 mt-3">
-                                    Full-stack portfolio with AI chat powered by FastAPI and OpenRouter.
+                                    Full-stack portfolio with AI chat powered by FastAPI and GroqCloud.
                                 </p>
                                 <h4 className="text-sm font-semibold mt-4 text-white/80">Key Work</h4>
                                 {/* BULLET POINTS */}
                                 <ul className="mt-4 space-y-2 text-sm text-gray-300">
-                                    <li>• Integrated OpenRouter LLM with backend context injection</li>
+                                    <li>• Integrated GroqCloud LLM with backend context injection</li>
                                     <li>• Built FastAPI backend with SQLite message storage</li>
                                     <li>• Designed modern animated UI with React + Tailwind</li>
                                     <li>• Resume-aware assistant answering recruiter questions</li>

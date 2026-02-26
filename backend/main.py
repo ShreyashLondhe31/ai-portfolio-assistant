@@ -11,6 +11,8 @@ from slowapi.errors import RateLimitExceeded
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
+from db import get_cached_reply, save_cache
+
 app = FastAPI()
 init_db()
 
@@ -60,26 +62,25 @@ class ChatRequest(BaseModel):
 @app.post("/chat")
 @limiter.limit("10/minute")
 def chat(request: Request, req: ChatRequest):
-    user_message = req.message
+    user_message = req.message.strip().lower()
 
-    try:
-        save_message("user", user_message)
+    # 1. CHECK CACHE
+    cached = get_cached_reply(user_message)
+    if cached:
+        return {"reply": cached}
 
-        ai_response = get_ai_response(user_message)
+    # 2. CALL AI
+    ai_response = get_ai_response(user_message)
+    reply_text = ai_response["reply"]
 
-        # SAFE PARSE
-        if isinstance(ai_response, dict) and "reply" in ai_response:
-            reply_text = ai_response["reply"]
-        else:
-            reply_text = str(ai_response)
+    # 3. SAVE CACHE
+    save_cache(user_message, reply_text)
 
-        save_message("assistant", reply_text)
+    # 4. SAVE CHAT HISTORY
+    save_message("user", user_message)
+    save_message("assistant", reply_text)
 
-        return {"reply": reply_text}
-
-    except Exception as e:
-        print("CHAT ERROR:", e)
-        return {"reply": "Server error. Try again."}
+    return {"reply": reply_text}
 
 # ---------------- GET MESSAGES ----------------
 @app.get("/messages")

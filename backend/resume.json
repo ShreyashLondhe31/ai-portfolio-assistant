@@ -7,8 +7,8 @@
   },
   "skills": {
     "frontend": ["React", "TypeScript", "TailwindCSS"],
-    "backend": ["Python", "FastAPI","RestAPI", "Django", "DjangoRestFramework", "Node.js"],
-    "database": ["Postgres", "MySQL","MongoDB"],
+    "backend": ["Python", "FastAPI", "RestAPI", "Django", "DjangoRestFramework", "Node.js"],
+    "database": ["Postgres", "MySQL", "MongoDB"],
     "other": ["Git", "REST APIs", "AI Integration", "OpenRouter API"]
   },
   "projects": [
@@ -36,6 +36,20 @@
     "Clean backend architecture design",
     "Focus on scalable systems",
     "Interest in AI-powered applications"
+  ],
+  "hobbies": [
+    {
+      "name": "Motorcycling",
+      "description": "Enjoy long-distance bike riding, which helps develop focus, discipline, and mental clarity."
+    },
+    {
+      "name": "Badminton",
+      "description": "Actively play badminton, promoting agility, strategic thinking, and teamwork."
+    },
+    {
+      "name": "PC Gaming",
+      "description": "Engage in PC gaming as a recreational activity that enhances strategic planning, reaction time, and problem-solving skills."
+    }
   ],
   "career_goal": "To become a strong full-stack engineer specializing in AI-powered applications and scalable backend systems."
 }

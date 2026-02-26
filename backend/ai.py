@@ -2,6 +2,7 @@ import os
 import json
 from dotenv import load_dotenv
 from groq import Groq
+import time
 
 load_dotenv()
 
@@ -41,7 +42,30 @@ RESUME DATA:
 {RESUME_CONTEXT}
 """
 
+CACHE = {}
+CACHE_TTL = 300  # seconds (5 minutes)
+
+def get_cached(key: str):
+    if key in CACHE:
+        data, ts = CACHE[key]
+        if time.time() - ts < CACHE_TTL:
+            return data
+        else:
+            del CACHE[key]
+    return None
+
+
+def set_cache(key: str, value: str):
+    CACHE[key] = (value, time.time())
+
 def get_ai_response(user_message: str):
+    normalized = user_message.strip().lower()
+
+    # CHECK CACHE
+    cached = get_cached(normalized)
+    if cached:
+        return {"reply": cached}
+
     try:
         completion = client.chat.completions.create(
             model="llama-3.1-8b-instant",
@@ -51,15 +75,13 @@ def get_ai_response(user_message: str):
                 {"role": "user", "content": user_message}
             ]
         )
-        print(completion)
 
-        # SAFE extraction
-        reply = completion.choices[0].message.content
+        reply = completion.choices[0].message.content.strip()
 
-        if not reply:
-            return {"reply": "AI returned empty response."}
+        # SAVE CACHE
+        set_cache(normalized, reply)
 
-        return {"reply": reply.strip()}
+        return {"reply": reply}
 
     except Exception as e:
         print("AI ERROR:", str(e))
