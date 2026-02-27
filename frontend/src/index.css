@@ -1,17 +1,205 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Developer Dark Palette ─────────────────────────────────────────────────── */
+:root {
+  /* backgrounds */
+  --bg:        #0D1117;   /* GitHub dark page background */
+  --bg2:       #010409;   /* deeper black for alternating sections */
+  --surface:   #161B22;   /* card background */
+  --surface2:  #21262D;   /* elevated card / hover state */
+
+  /* borders */
+  --border:    #30363D;
+  --border-2:  rgba(48,54,61,0.5);
+
+  /* accent — SINGLE blue, no rainbow */
+  --accent:    #2F81F7;   /* GitHub link blue */
+  --accent-d:  #1F6FEB;   /* darker for hover */
+  --accent-glow: rgba(47,129,247,0.22);
+
+  /* status colors (code-like) */
+  --green:     #3FB950;   /* GitHub green — "open to work" */
+  --orange:    #D29922;   /* warning / highlight */
+  --purple:    #A371F7;   /* keyword purple */
+  --red:       #F85149;   /* error red, used sparingly */
+
+  /* text */
+  --text:      #E6EDF3;
+  --text-2:    #8B949E;
+  --text-3:    #6E7681;
+
+  /* misc */
+  --mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --shadow-card: 0 1px 0 rgba(255,255,255,0.04), 0 4px 24px rgba(0,0,0,0.6);
+}
+
+/* ─── Base ───────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
 html {
   scroll-behavior: smooth;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: var(--text);
+  background: var(--bg);
 }
 
 body {
-  background: radial-gradient(circle at top, #111827, #0b0f19 60%);
+  background: var(--bg);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+::selection {
+  background: rgba(47,129,247,0.28);
+  color: var(--text);
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ─── Three.js canvas (network graph) ───────────────────────────────────────── */
+#hero-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.55;
+}
+
+/* ─── Keyframes ──────────────────────────────────────────────────────────────── */
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
 }
 
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-12px); }
-  100% { transform: translateY(0px); }
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+
+@keyframes slide-in-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scan-line {
+  0%   { top: 0; }
+  100% { top: 100%; }
+}
+
+@keyframes loader-bar {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+
+/* ─── Utility classes ────────────────────────────────────────────────────────── */
+
+/* monospace label — used for section markers */
+.mono { font-family: var(--mono); }
+
+/* code comment style */
+.code-comment {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--text-3);
+  letter-spacing: 0.02em;
+}
+
+/* inline code token (badge) */
+.token {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(47,129,247,0.10);
+  border: 1px solid rgba(47,129,247,0.22);
+  color: var(--accent);
+  letter-spacing: 0.01em;
+}
+
+.token-green  { background: rgba(63,185,80,0.10);  border-color: rgba(63,185,80,0.22);  color: var(--green);  }
+.token-purple { background: rgba(163,113,247,0.10); border-color: rgba(163,113,247,0.22); color: var(--purple); }
+.token-orange { background: rgba(210,153,34,0.10);  border-color: rgba(210,153,34,0.22);  color: var(--orange); }
+
+/* glass card — dark version */
+.glass {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
+}
+
+/* primary button */
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 0.875rem;
+  border: 1px solid var(--accent-d);
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+.btn-primary:hover {
+  background: var(--accent-d);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+/* ghost button */
+.btn-ghost {
+  background: var(--surface2);
+  color: var(--text);
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 0.875rem;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s, border-color 0.15s;
+}
+.btn-ghost:hover {
+  background: var(--surface2);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+/* blinking cursor (for typing effect) */
+.cursor::after {
+  content: '_';
+  animation: blink-cursor 1.1s step-end infinite;
+  color: var(--accent);
+  font-family: var(--mono);
+}
+
+/* skill bar (terminal-progress style) */
+.skill-bar {
+  height: 5px;
+  border-radius: 99px;
+  background: var(--surface2);
+  overflow: hidden;
+}
+.skill-fill {
+  height: 100%;
+  border-radius: 99px;
+  width: 0%;
+  transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(90deg, var(--accent), #58A6FF);
+}
+
+/* dot grid rule for section backgrounds */
+.dot-grid {
+  background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Portfolio from "./pages/Portfolio";
+import ProjectDetail from "./pages/ProjectDetail";
 import NotFound from "./pages/NotFound";
 import Loader from "./components/Loader";
 
@@ -8,7 +9,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const t = setTimeout(() => setLoading(false), 900);
+    const t = setTimeout(() => setLoading(false), 1400);
     return () => clearTimeout(t);
   }, []);
 
@@ -18,6 +19,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Portfolio />} />
+        <Route path="/projects/:id" element={<ProjectDetail />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

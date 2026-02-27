@@ -1,11 +1,13 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import { gsap } from "gsap";
+import { X, Menu, Terminal } from "lucide-react";
 
 const navLinks = [
-  { label: "About", id: "about" },
-  { label: "Projects", id: "projects" },
-  { label: "Contact", id: "contact" },
+  { label: "about", id: "about" },
+  { label: "projects", id: "projects" },
+  { label: "contact", id: "contact" },
 ];
 
 export default function Navbar() {
@@ -13,78 +15,84 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
+  const navRef = useRef<HTMLElement>(null);
+  const logoRef = useRef<HTMLDivElement>(null);
+  const linksRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      const windowHeight = window.innerHeight;
-      const fullHeight = document.body.offsetHeight;
+    const ctx = gsap.context(() => {
+      gsap.from([logoRef.current, linksRef.current], {
+        y: -20, opacity: 0, duration: 0.5,
+        stagger: 0.1, ease: "power2.out", delay: 0.1,
+      });
+    }, navRef);
+    return () => ctx.revert();
+  }, []);
 
-      setScrolled(scrollPosition > 20);
-
-      if (scrollPosition + windowHeight >= fullHeight - 50) {
-        setActive("contact");
-        return;
-      }
-
+  useEffect(() => {
+    const handle = () => {
+      const scrollY = window.scrollY;
+      const winH = window.innerHeight;
+      const docH = document.body.offsetHeight;
+      setScrolled(scrollY > 20);
+      if (scrollY + winH >= docH - 50) { setActive("contact"); return; }
       for (let i = navLinks.length - 1; i >= 0; i--) {
-        const section = document.getElementById(navLinks[i].id);
-        if (section && scrollPosition + 150 >= section.offsetTop) {
-          setActive(navLinks[i].id);
-          break;
-        }
+        const el = document.getElementById(navLinks[i].id);
+        if (el && scrollY + 150 >= el.offsetTop) { setActive(navLinks[i].id); break; }
       }
     };
-
-    window.addEventListener("scroll", handleScroll);
-    handleScroll();
-
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handle);
+    handle();
+    return () => window.removeEventListener("scroll", handle);
   }, []);
 
   const scrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-      setOpen(false);
-    }
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    setOpen(false);
   };
 
   return (
     <motion.nav
-      initial={{ y: -72, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.55 }}
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled
-        ? "backdrop-blur-xl bg-[#07090f]/85 border-b border-white/10"
-        : "bg-transparent"
-        }`}
+      ref={navRef as any}
+      className="fixed top-0 w-full z-50 transition-all duration-200"
+      style={{
+        background: scrolled ? "rgba(13,17,23,0.92)" : "rgba(13,17,23,0.70)",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
+        borderBottom: scrolled ? "1px solid var(--border)" : "1px solid transparent",
+      }}
     >
-      <div className="max-w-6xl mx-auto flex items-center justify-between py-4 px-6">
+      <div className="max-w-6xl mx-auto flex items-center justify-between py-3.5 px-6">
 
         {/* Logo */}
-        <button
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="flex items-center gap-2.5"
-        >
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center text-[11px] font-bold">
-            SL
+        <div ref={logoRef} className="flex items-center gap-2.5">
+          <div
+            className="w-8 h-8 rounded-md flex items-center justify-center"
+            style={{ background: "var(--accent)", boxShadow: "0 0 12px var(--accent-glow)" }}
+          >
+            <Terminal size={15} color="#fff" />
           </div>
-          <span className="text-sm font-semibold text-white/80 hidden sm:block">
-            Shreyash Londhe
-          </span>
-        </button>
+          <div style={{ fontFamily: "var(--mono)" }}>
+            <span style={{ color: "var(--text)", fontSize: "0.85rem", fontWeight: 600 }}>shreyash</span>
+            <span style={{ color: "var(--accent)", fontSize: "0.85rem" }}>.dev</span>
+          </div>
+        </div>
 
-        {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-2">
+        {/* Desktop links */}
+        <div ref={linksRef} className="hidden md:flex items-center gap-1">
           {navLinks.map(({ label, id }) => (
             <button
               key={id}
               onClick={() => scrollTo(id)}
-              className={`px-4 py-2 rounded-lg text-sm transition ${active === id
-                ? "bg-white/10 text-white"
-                : "text-gray-400 hover:text-white"
-                }`}
+              className="relative px-4 py-2 rounded-md text-sm transition-all duration-150"
+              style={{
+                fontFamily: "var(--mono)",
+                color: active === id ? "var(--accent)" : "var(--text-2)",
+                background: active === id ? "rgba(47,129,247,0.10)" : "transparent",
+                border: active === id ? "1px solid rgba(47,129,247,0.22)" : "1px solid transparent",
+              }}
             >
+              {active === id && <span style={{ color: "var(--text-3)", marginRight: 4 }}>{">"}</span>}
               {label}
             </button>
           ))}
@@ -93,18 +101,20 @@ export default function Navbar() {
             href="/resume.pdf"
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-2 bg-white text-black px-4 py-2 rounded-lg font-medium hover:scale-105 transition"
+            className="ml-3 btn-primary"
           >
-            Resume
+            resume.pdf
           </a>
         </div>
 
-        {/* Mobile Hamburger */}
+        {/* Hamburger */}
         <button
-          className="md:hidden text-white text-xl"
+          className="md:hidden p-2 rounded-md"
+          style={{ background: "var(--surface2)", border: "1px solid var(--border)", color: "var(--text)" }}
           onClick={() => setOpen(!open)}
+          aria-label="Toggle menu"
         >
-          ☰
+          {open ? <X size={18} /> : <Menu size={18} />}
         </button>
       </div>
 
@@ -112,47 +122,48 @@ export default function Navbar() {
         <AnimatePresence>
           {open && (
             <>
-              {/* BACKDROP */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999]"
+                className="fixed inset-0 z-[999]"
+                style={{ background: "rgba(0,0,0,0.6)" }}
                 onClick={() => setOpen(false)}
               />
-
-              {/* DRAWER */}
               <motion.div
-                initial={{ y: -20, opacity: 0 }}
+                initial={{ y: -16, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                exit={{ y: -20, opacity: 0 }}
-                className="fixed top-[64px] left-0 w-full bg-[#0b0f19] border-t border-white/10 z-[1000]"
+                exit={{ y: -16, opacity: 0 }}
+                transition={{ type: "tween", duration: 0.2 }}
+                className="fixed top-[58px] left-0 w-full z-[1000]"
+                style={{
+                  background: "var(--surface)",
+                  borderBottom: "1px solid var(--border)",
+                }}
               >
-                <div className="flex flex-col items-center py-6 space-y-6">
-
+                <div className="flex flex-col items-center py-6 gap-4">
                   {navLinks.map(({ label, id }) => (
                     <button
                       key={id}
                       onClick={() => scrollTo(id)}
-                      className={`text-sm ${active === id
-                          ? "text-white"
-                          : "text-gray-400 hover:text-white"
-                        }`}
+                      className="text-sm"
+                      style={{
+                        fontFamily: "var(--mono)",
+                        color: active === id ? "var(--accent)" : "var(--text-2)",
+                      }}
                     >
-                      {label}
+                      {active === id ? "> " : "  "}{label}
                     </button>
                   ))}
-
                   <a
                     href="/resume.pdf"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-white text-black px-5 py-2 rounded-lg font-medium"
+                    className="btn-primary mt-2"
                     onClick={() => setOpen(false)}
                   >
-                    Resume
+                    resume.pdf
                   </a>
-
                 </div>
               </motion.div>
             </>

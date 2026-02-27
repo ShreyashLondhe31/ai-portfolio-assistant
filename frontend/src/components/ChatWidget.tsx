@@ -1,21 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, X, MessageSquare, Sparkles } from "lucide-react";
+import { Send, Terminal, Sparkles } from "lucide-react";
 
-type Message = {
-  role: "user" | "assistant";
-  content: string;
-};
+type Message = { role: "user" | "assistant"; content: string };
 
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content:
-        "Hi! I'm Shreyash's AI assistant. Ask me anything about his skills, projects, or experience.",
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([{
+    role: "assistant",
+    content: "Hi! I'm Shreyash's AI assistant. Ask me anything about his skills, projects, or experience.",
+  }]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -24,69 +18,33 @@ export default function ChatWidget() {
   const sendMessage = async () => {
     const trimmed = input.trim();
     if (!trimmed || loading) return;
-
-    const userMessage: Message = { role: "user", content: trimmed };
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages((prev) => [...prev, { role: "user", content: trimmed }]);
     setInput("");
     setLoading(true);
 
     try {
-      const res = await fetch(
-        "https://ai-portfolio-backend-v8f1.onrender.com/chat",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: trimmed }),
-        }
-      );
-
+      const res = await fetch("https://ai-portfolio-backend-v8f1.onrender.com/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: trimmed }),
+      });
       const data = await res.json();
-
-      let cleaned = data.reply || "";
-
-      // remove markdown bold
-      cleaned = cleaned.replace(/\*\*/g, "");
-
-      // fix escaped new lines
-      cleaned = cleaned.replace(/\\n/g, "\n");
-
-      // remove weird spacing
-      cleaned = cleaned.replace(/\n{3,}/g, "\n\n");
-
-      // trim
-      cleaned = cleaned.trim();
-
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: cleaned }
-      ]);
+      const cleaned = (data.reply || "")
+        .replace(/\*\*/g, "")
+        .replace(/\\n/g, "\n")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+      setMessages((prev) => [...prev, { role: "assistant", content: cleaned }]);
     } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: "Unable to reach server. Try again.",
-        },
-      ]);
+      setMessages((prev) => [...prev, { role: "assistant", content: "Unable to reach server. Try again." }]);
     }
-
     setLoading(false);
   };
 
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading]);
-
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, loading]);
   useEffect(() => {
     if (isOpen) {
-      setMessages([
-        {
-          role: "assistant",
-          content:
-            "Hi! I'm Shreyash's AI assistant. Ask me anything about his skills or projects.",
-        },
-      ]);
-
+      setMessages([{ role: "assistant", content: "Hi! I'm Shreyash's AI assistant. Ask me anything about his skills or projects." }]);
       setTimeout(() => inputRef.current?.focus(), 300);
     }
   }, [isOpen]);
@@ -94,159 +52,188 @@ export default function ChatWidget() {
   return (
     <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-2">
 
-      {/* ONLINE LABEL */}
-      <div className="flex items-center gap-2 pr-1">
-        <div className="w-2.5 h-2.5 bg-green-400 rounded-full"></div>
-        <p className="text-xs text-white/80 font-medium">AI Assistant</p>
+      {/* Status label */}
+      <div className="flex items-center gap-2 pr-1" style={{ fontFamily: "var(--mono)" }}>
+        <span className="w-2 h-2 rounded-full" style={{ background: "var(--green)", boxShadow: "0 0 6px var(--green)" }} />
+        <span className="text-xs" style={{ color: "var(--text-3)" }}>ai_assistant</span>
       </div>
 
-      {/* FLOAT BUTTON */}
+      {/* Float button */}
       <AnimatePresence>
         {!isOpen && (
           <motion.button
-            initial={{ scale: 0.8, opacity: 0 }}
+            initial={{ scale: 0.85, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.95 }}
+            exit={{ scale: 0.85, opacity: 0 }}
+            whileHover={{ scale: 1.06 }}
+            whileTap={{ scale: 0.96 }}
             onClick={() => setIsOpen(true)}
-            className="relative w-14 h-14 bg-gradient-to-br from-violet-600 to-blue-600 rounded-2xl shadow-xl flex items-center justify-center text-white"
+            className="w-12 h-12 rounded-lg flex items-center justify-center text-white"
+            style={{
+              background: "var(--accent)",
+              border: "1px solid rgba(47,129,247,0.5)",
+              boxShadow: "0 4px 20px var(--accent-glow)",
+            }}
           >
-            <MessageSquare size={22} />
-            <span className="absolute inset-0 rounded-2xl border border-violet-400/30 animate-ping" />
+            <Terminal size={20} />
           </motion.button>
         )}
       </AnimatePresence>
 
-      {/* CHAT PANEL */}
+      {/* Chat panel */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.92, y: 20 }}
+            initial={{ opacity: 0, scale: 0.94, y: 16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.92, y: 20 }}
-            transition={{ duration: 0.35 }}
-            className="
-              w-[94vw] sm:w-[380px]
-              h-[78vh] sm:h-[540px]
-              max-w-[420px]
-              flex flex-col
-              rounded-3xl
-              overflow-hidden
-              shadow-2xl
-              border border-white/10
-            "
+            exit={{ opacity: 0, scale: 0.94, y: 16 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+            className="w-[94vw] sm:w-[380px] h-[78vh] sm:h-[520px] max-w-[420px] flex flex-col rounded-lg overflow-hidden"
             style={{
-              background: "rgba(10,14,25,0.92)",
-              backdropFilter: "blur(22px)",
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+              boxShadow: "0 16px 48px rgba(0,0,0,0.6)",
             }}
           >
-
-            {/* HEADER */}
-            <div className="px-4 py-3 flex items-center gap-3 border-b border-white/10">
-              <div className="relative">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-blue-600 flex items-center justify-center text-xs font-bold">
-                  SL
+            {/* Header — Windows title bar style */}
+            <div
+              className="flex items-center justify-between"
+              style={{ background: "var(--surface2)", borderBottom: "1px solid var(--border)" }}
+            >
+              {/* Left: app icon + title */}
+              <div className="flex items-center gap-2 px-4 py-2.5">
+                <div
+                  className="w-4 h-4 rounded-sm flex items-center justify-center text-white"
+                  style={{ background: "var(--accent)", fontSize: "9px", fontWeight: 700, fontFamily: "var(--mono)" }}
+                >
+                  &gt;
                 </div>
-                <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-[#0d1220]" />
+                <p className="text-xs" style={{ fontFamily: "var(--mono)", color: "var(--text-2)" }}>
+                  shreyash_ai
+                  <span style={{ color: "var(--text-3)", marginLeft: 4 }}>— AI Terminal</span>
+                </p>
+                <div className="flex items-center gap-1 ml-2 text-[10px]" style={{ fontFamily: "var(--mono)", color: "var(--green)" }}>
+                  <Sparkles size={9} />
+                  <span>online</span>
+                </div>
               </div>
 
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-white">
-                  Shreyash's Assistant
-                </p>
-                <p className="text-xs text-emerald-400 flex items-center gap-1 mt-1">
-                  <Sparkles size={10} />
-                  AI-powered · Online
-                </p>
+              {/* Right: Windows ─ □ × */}
+              <div className="flex items-stretch h-full" style={{ fontFamily: "var(--mono)", fontSize: "0.7rem" }}>
+                <button
+                  className="px-4 py-2.5 hover:bg-[#21262D] transition-colors select-none"
+                  style={{ color: "var(--text-3)" }}
+                  title="Minimize"
+                  onClick={() => setIsOpen(false)}
+                >─</button>
+                <button
+                  className="px-4 py-2.5 hover:bg-[#21262D] transition-colors select-none"
+                  style={{ color: "var(--text-3)" }}
+                  title="Maximize"
+                >□</button>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="px-4 py-2.5 hover:bg-[#F85149] hover:text-white transition-colors select-none"
+                  style={{ color: "var(--text-3)" }}
+                  title="Close"
+                >✕</button>
               </div>
-
-              <button
-                onClick={() => setIsOpen(false)}
-                className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center"
-              >
-                <X size={15} />
-              </button>
             </div>
 
-            {/* MESSAGES */}
-            <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-4 space-y-3 text-sm">
-
+            {/* Messages */}
+            <div
+              className="flex-1 overflow-y-auto px-4 py-4 space-y-3 text-sm"
+              style={{ background: "var(--bg2)" }}
+            >
               {messages.map((msg, i) => (
-                <div
-                  key={i}
-                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"
-                    }`}
-                >
+                <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                   {msg.role === "assistant" && (
-                    <div className="w-6 h-6 mr-2 mt-1 rounded-lg bg-gradient-to-br from-violet-500 to-blue-600 flex items-center justify-center text-[9px] font-bold flex-shrink-0">
-                      SL
+                    <div
+                      className="w-6 h-6 mr-2 mt-0.5 rounded-md flex items-center justify-center text-[9px] font-bold flex-shrink-0 text-white"
+                      style={{ background: "var(--accent)" }}
+                    >
+                      AI
                     </div>
                   )}
-
                   <div
-                    className={`
-                      max-w-[85%]
-                      px-4 py-3
-                      rounded-2xl
-                      whitespace-pre-wrap
-                      leading-relaxed
-                      ${msg.role === "user"
-                        ? "bg-gradient-to-br from-violet-600 to-blue-600 text-white rounded-tr-sm"
-                        : "bg-white/10 text-gray-200 border border-white/10 rounded-tl-sm"
-                      }
-                    `}
+                    className="max-w-[85%] px-3.5 py-2.5 rounded-md whitespace-pre-wrap leading-relaxed text-xs"
+                    style={
+                      msg.role === "user"
+                        ? {
+                          background: "var(--accent)",
+                          color: "#fff",
+                          borderRadius: "8px 8px 2px 8px",
+                        }
+                        : {
+                          background: "var(--surface)",
+                          border: "1px solid var(--border)",
+                          color: "var(--text)",
+                          fontFamily: "var(--mono)",
+                          borderRadius: "2px 8px 8px 8px",
+                        }
+                    }
                   >
+                    {msg.role === "assistant" && (
+                      <span style={{ color: "var(--green)" }}>{">"} </span>
+                    )}
                     {msg.content}
                   </div>
                 </div>
               ))}
 
-              {/* TYPING */}
               {loading && (
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-500 to-blue-600 flex items-center justify-center text-[9px] font-bold">
-                    SL
-                  </div>
-                  <div className="px-4 py-3 rounded-2xl bg-white/10 border border-white/10 flex gap-1">
-                    <span className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" />
-                    <span className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce delay-100" />
-                    <span className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce delay-200" />
+                  <div
+                    className="w-6 h-6 rounded-md flex items-center justify-center text-[9px] font-bold text-white"
+                    style={{ background: "var(--accent)" }}
+                  >AI</div>
+                  <div
+                    className="px-3.5 py-2.5 rounded-md flex gap-1.5"
+                    style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+                  >
+                    {[0, 1, 2].map(i => (
+                      <span
+                        key={i}
+                        className="w-1 h-1 rounded-full animate-bounce"
+                        style={{ background: "var(--text-3)", animationDelay: `${i * 80}ms` }}
+                      />
+                    ))}
                   </div>
                 </div>
               )}
-
               <div ref={bottomRef} />
             </div>
 
-            {/* INPUT */}
-            <div className="px-3 sm:px-4 py-3 border-t border-white/10">
-              <div className="flex items-center gap-2 bg-white/10 rounded-2xl px-3 py-2">
+            {/* Input */}
+            <div
+              className="px-4 py-3"
+              style={{ borderTop: "1px solid var(--border)", background: "var(--surface)" }}
+            >
+              <div
+                className="flex items-center gap-2 rounded-md px-3 py-2"
+                style={{ background: "var(--bg2)", border: "1px solid var(--border)" }}
+              >
+                <span style={{ fontFamily: "var(--mono)", color: "var(--accent)", fontSize: "0.7rem", flexShrink: 0 }}>PS&gt;</span>
                 <input
                   ref={inputRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      sendMessage();
-                    }
-                  }}
-                  placeholder="Ask about Shreyash..."
-                  className="flex-1 bg-transparent text-white text-sm outline-none placeholder-gray-400"
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); sendMessage(); } }}
+                  placeholder="ask anything..."
+                  className="flex-1 bg-transparent text-xs outline-none"
+                  style={{ fontFamily: "var(--mono)", color: "var(--text)" }}
                 />
-
                 <button
                   onClick={sendMessage}
                   disabled={!input.trim() || loading}
-                  className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-blue-600 flex items-center justify-center text-white disabled:opacity-40"
+                  className="w-7 h-7 rounded-md flex items-center justify-center text-white disabled:opacity-30 transition-transform hover:scale-105"
+                  style={{ background: "var(--accent)" }}
                 >
-                  <Send size={15} />
+                  <Send size={13} />
                 </button>
               </div>
-
-              <p className="text-center text-gray-500 text-[10px] mt-2">
-                Powered by GroqCloud
+              <p className="text-center text-[10px] mt-1.5" style={{ fontFamily: "var(--mono)", color: "var(--text-3)" }}>
+                powered by groqcloud
               </p>
             </div>
           </motion.div>

@@ -1,56 +1,75 @@
-import { motion } from "framer-motion";
-import { Briefcase, Code2, MapPin } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { Wifi, Code2, MapPin } from "lucide-react";
 
 export default function TopIntroBar() {
-    return (
-        <div className="w-full sm:mt-10 px-4 pt-20">
-            <div className="max-w-6xl mx-auto space-y-3">
+    const rootRef = useRef<HTMLDivElement>(null);
 
-                {/* Availability Banner */}
-                <motion.div
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border border-white/10 bg-gradient-to-r from-violet-500/10 to-blue-500/10 backdrop-blur-xl"
+    useEffect(() => {
+        const ctx = gsap.context(() => {
+            gsap.from(rootRef.current!.children, {
+                y: 14, opacity: 0, duration: 0.45,
+                stagger: 0.1, ease: "power2.out", delay: 0.5,
+            });
+        }, rootRef);
+        return () => ctx.revert();
+    }, []);
+
+    return (
+        <div className="w-full px-4 pt-20 sm:pt-24" ref={rootRef}>
+            <div className="max-w-6xl mx-auto space-y-2">
+
+                {/* Status bar — like a terminal status line */}
+                <div
+                    className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-md"
+                    style={{
+                        background: "var(--surface)",
+                        border: "1px solid var(--border)",
+                        fontFamily: "var(--mono)",
+                    }}
                 >
-                    <div className="flex items-center gap-3 text-sm">
-                        <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse" />
-                        <p className="text-white/80">
-                            Open to internships & AI engineer roles
-                        </p>
+                    <div className="flex items-center gap-3 text-xs">
+                        <span
+                            className="w-2 h-2 rounded-full flex-shrink-0"
+                            style={{ background: "var(--green)", boxShadow: "0 0 6px var(--green)" }}
+                        />
+                        <span style={{ color: "var(--text-2)" }}>status:</span>
+                        <span style={{ color: "var(--green)", fontWeight: 600 }}>open_to_work</span>
+                        <span style={{ color: "var(--text-3)" }}>// internships &amp; AI engineer roles</span>
                     </div>
 
-                    <span className="text-xs text-white/40 flex items-center gap-1">
-                        <MapPin size={14} />
+                    <span className="hidden sm:flex items-center gap-1 text-xs" style={{ color: "var(--text-3)" }}>
+                        <MapPin size={12} />
                         Mumbai / Pune
                     </span>
-                </motion.div>
+                </div>
 
-                {/* Stats Strip */}
-                <motion.div
-                    initial={{ opacity: 0, y: 14 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.1 }}
-                    className="grid grid-cols-2 gap-3"
-                >
-                    <Stat icon={<Code2 size={16} />} label="Projects" value="4+" />
-                    {/* <Stat icon={<Brain size={16} />} label="AI Apps" value="3+" /> */}
-                    <Stat icon={<Briefcase size={16} />} label="Intern Ready" value="2026" />
-                </motion.div>
+                {/* Stat pills */}
+                <div className="grid grid-cols-2 gap-2">
+                    <Stat icon={<Code2 size={13} />} label="projects_built" value="4" />
+                    <Stat icon={<Wifi size={13} />} label="intern_ready" value="2026" />
+                </div>
 
             </div>
         </div>
     );
 }
 
-function Stat({ icon, label, value }: any) {
+function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
     return (
-        <div className="px-4 py-3 rounded-xl border border-white/8 bg-white/5 backdrop-blur-xl text-center">
-            <div className="flex items-center justify-center gap-1 text-violet-400 mb-1">
-                {icon}
-                <span className="font-semibold text-white">{value}</span>
+        <div
+            className="px-4 py-2.5 rounded-md flex items-center justify-between"
+            style={{
+                background: "var(--surface)",
+                border: "1px solid var(--border)",
+                fontFamily: "var(--mono)",
+            }}
+        >
+            <div className="flex items-center gap-2 text-xs" style={{ color: "var(--text-2)" }}>
+                <span style={{ color: "var(--accent)" }}>{icon}</span>
+                {label}
             </div>
-            <p className="text-[11px] text-white/50">{label}</p>
+            <span className="text-xs font-bold" style={{ color: "var(--text)" }}>{value}</span>
         </div>
     );
 }

@@ -1,45 +1,87 @@
-import { motion } from "framer-motion";
+import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
 
 export default function Loader() {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const barRef = useRef<HTMLDivElement>(null);
+    const linesRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const ctx = gsap.context(() => {
+            const tl = gsap.timeline();
+
+            // Terminal lines stagger in
+            tl.from(".boot-line", {
+                opacity: 0, x: -10,
+                duration: 0.25, stagger: 0.12, ease: "none",
+            });
+
+            // Bar fills
+            tl.to(barRef.current, {
+                width: "100%", duration: 0.6, ease: "power2.inOut",
+            }, "-=0.1");
+
+            // Fade out
+            tl.to(containerRef.current, {
+                opacity: 0, duration: 0.4, ease: "power2.in", delay: 0.2,
+            });
+        }, containerRef);
+
+        return () => ctx.revert();
+    }, []);
+
+    const bootLines = [
+        "> Initializing portfolio...",
+        "> Loading projects...",
+        "> Starting dev server...",
+        "> Ready.",
+    ];
+
     return (
-        <div className="fixed inset-0 bg-[#0b0f19] flex items-center justify-center z-[2000]">
-            <div className="flex flex-col items-center gap-6 text-center">
-
-                {/* NAME */}
-                <motion.h1
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                    className="text-3xl sm:text-4xl font-semibold tracking-wide text-white"
-                >
-                    Shreyash Londhe
-                </motion.h1>
-
-                {/* SUBTEXT */}
-                <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 0.6 }}
-                    transition={{ delay: 0.3 }}
-                    className="text-xs tracking-[0.25em] text-white/50"
-                >
-                    LOADING PORTFOLIO
-                </motion.p>
-
-                {/* LINE LOADER */}
-                <div className="w-48 h-[2px] bg-white/10 overflow-hidden rounded">
-                    <motion.div
-                        initial={{ x: "-100%" }}
-                        animate={{ x: "100%" }}
-                        transition={{
-                            repeat: Infinity,
-                            duration: 1.2,
-                            ease: "linear",
-                        }}
-                        className="h-full w-1/2 bg-gradient-to-r from-violet-500 to-indigo-500"
-                    />
-                </div>
-
+        <div
+            ref={containerRef}
+            className="fixed inset-0 z-[9999] flex flex-col items-center justify-center"
+            style={{ background: "var(--bg)" }}
+        >
+            {/* ASCII logo */}
+            <div
+                className="text-xl font-bold mb-6 tracking-widest"
+                style={{ fontFamily: "var(--mono)", color: "var(--accent)" }}
+            >
+                SL /
+                <span style={{ color: "var(--text-2)", fontWeight: 400 }}> shreyash londhe</span>
             </div>
-        </div >
+
+            {/* Terminal boot lines */}
+            <div
+                ref={linesRef}
+                className="mb-6 text-left w-72 space-y-1"
+            >
+                {bootLines.map((line, i) => (
+                    <p
+                        key={i}
+                        className="boot-line text-xs"
+                        style={{
+                            fontFamily: "var(--mono)",
+                            color: i === bootLines.length - 1 ? "var(--green)" : "var(--text-3)",
+                        }}
+                    >
+                        {line}
+                    </p>
+                ))}
+            </div>
+
+            {/* Progress bar — terminal style */}
+            <div
+                className="w-72 h-[2px] rounded-full overflow-hidden"
+                style={{ background: "var(--surface2)" }}
+            >
+                <div
+                    ref={barRef}
+                    className="h-full rounded-full"
+                    style={{ width: "0%", background: "var(--accent)" }}
+                />
+            </div>
+        </div>
     );
 }
