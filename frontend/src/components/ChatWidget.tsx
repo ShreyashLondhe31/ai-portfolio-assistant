@@ -1,19 +1,38 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useImperativeHandle, forwardRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, Terminal, Sparkles } from "lucide-react";
 
 type Message = { role: "user" | "assistant"; content: string };
 
-export default function ChatWidget() {
+export type ChatWidgetHandle = {
+  openWithPrompt: (prompt: string) => void;
+};
+
+const ChatWidget = forwardRef<ChatWidgetHandle>((_, ref) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([{
     role: "assistant",
-    content: "Hi! I'm Shreyash's AI assistant. Ask me anything about his skills, projects, or experience.",
+    content: "I'm Shreyash's AI assistant. Ask me about his architecture decisions, stack choices, or project details.",
   }]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    openWithPrompt(prompt: string) {
+      setIsOpen(true);
+      setMessages([{
+        role: "assistant",
+        content: "I'm Shreyash's AI assistant. Ask me about his architecture decisions, stack choices, or project details.",
+      }]);
+      // Brief delay to let the panel animate in before focusing
+      setTimeout(() => {
+        setInput(prompt);
+        inputRef.current?.focus();
+      }, 250);
+    },
+  }));
 
   const sendMessage = async () => {
     const trimmed = input.trim();
@@ -36,16 +55,18 @@ export default function ChatWidget() {
         .trim();
       setMessages((prev) => [...prev, { role: "assistant", content: cleaned }]);
     } catch {
-      setMessages((prev) => [...prev, { role: "assistant", content: "Unable to reach server. Try again." }]);
+      setMessages((prev) => [...prev, { role: "assistant", content: "Unable to reach server. Try again later." }]);
     }
     setLoading(false);
   };
 
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, loading]);
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading]);
+
   useEffect(() => {
     if (isOpen) {
-      setMessages([{ role: "assistant", content: "Hi! I'm Shreyash's AI assistant. Ask me anything about his skills or projects." }]);
-      setTimeout(() => inputRef.current?.focus(), 300);
+      setTimeout(() => inputRef.current?.focus(), 280);
     }
   }, [isOpen]);
 
@@ -54,8 +75,11 @@ export default function ChatWidget() {
 
       {/* Status label */}
       <div className="flex items-center gap-2 pr-1" style={{ fontFamily: "var(--mono)" }}>
-        <span className="w-2 h-2 rounded-full" style={{ background: "var(--green)", boxShadow: "0 0 6px var(--green)" }} />
-        <span className="text-xs" style={{ color: "var(--text-3)" }}>ai_assistant</span>
+        <span
+          className="w-1.5 h-1.5 rounded-full"
+          style={{ background: "var(--green)", boxShadow: "0 0 5px var(--green)" }}
+        />
+        <span className="text-[10px]" style={{ color: "var(--text-3)" }}>ai_assistant</span>
       </div>
 
       {/* Float button */}
@@ -65,17 +89,17 @@ export default function ChatWidget() {
             initial={{ scale: 0.85, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.85, opacity: 0 }}
-            whileHover={{ scale: 1.06 }}
+            whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.96 }}
             onClick={() => setIsOpen(true)}
-            className="w-12 h-12 rounded-lg flex items-center justify-center text-white"
+            className="w-11 h-11 rounded-md flex items-center justify-center"
             style={{
-              background: "var(--accent)",
-              border: "1px solid rgba(47,129,247,0.5)",
-              boxShadow: "0 4px 20px var(--accent-glow)",
+              background: "rgba(99,102,241,0.12)",
+              border: "1px solid rgba(99,102,241,0.35)",
+              color: "var(--accent)",
             }}
           >
-            <Terminal size={20} />
+            <Terminal size={18} />
           </motion.button>
         )}
       </AnimatePresence>
@@ -84,56 +108,62 @@ export default function ChatWidget() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.94, y: 16 }}
+            initial={{ opacity: 0, scale: 0.96, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.94, y: 16 }}
-            transition={{ duration: 0.22, ease: "easeOut" }}
-            className="w-[94vw] sm:w-[380px] h-[78vh] sm:h-[520px] max-w-[420px] flex flex-col rounded-lg overflow-hidden"
+            exit={{ opacity: 0, scale: 0.96, y: 12 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="w-[94vw] sm:w-[380px] h-[76vh] sm:h-[500px] max-w-[420px] flex flex-col rounded-lg overflow-hidden"
             style={{
               background: "var(--surface)",
               border: "1px solid var(--border)",
-              boxShadow: "0 16px 48px rgba(0,0,0,0.6)",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.7)",
             }}
           >
-            {/* Header — Windows title bar style */}
+            {/* Header — Windows title bar */}
             <div
               className="flex items-center justify-between"
               style={{ background: "var(--surface2)", borderBottom: "1px solid var(--border)" }}
             >
-              {/* Left: app icon + title */}
+              {/* Left */}
               <div className="flex items-center gap-2 px-4 py-2.5">
                 <div
-                  className="w-4 h-4 rounded-sm flex items-center justify-center text-white"
-                  style={{ background: "var(--accent)", fontSize: "9px", fontWeight: 700, fontFamily: "var(--mono)" }}
+                  className="w-3.5 h-3.5 rounded-sm flex items-center justify-center"
+                  style={{
+                    background: "rgba(99,102,241,0.15)",
+                    border: "1px solid rgba(99,102,241,0.30)",
+                    color: "var(--accent)",
+                    fontSize: "8px",
+                    fontFamily: "var(--mono)",
+                  }}
                 >
                   &gt;
                 </div>
-                <p className="text-xs" style={{ fontFamily: "var(--mono)", color: "var(--text-2)" }}>
+                <p className="text-xs" style={{ fontFamily: "var(--mono)", color: "var(--text-3)" }}>
                   shreyash_ai
-                  <span style={{ color: "var(--text-3)", marginLeft: 4 }}>— AI Terminal</span>
+                  <span style={{ color: "var(--text-3)", marginLeft: 4, opacity: 0.6 }}>— AI Terminal</span>
                 </p>
-                <div className="flex items-center gap-1 ml-2 text-[10px]" style={{ fontFamily: "var(--mono)", color: "var(--green)" }}>
-                  <Sparkles size={9} />
+                <div className="flex items-center gap-1 ml-1 text-[9px]" style={{ fontFamily: "var(--mono)", color: "var(--green)" }}>
+                  <Sparkles size={8} />
                   <span>online</span>
                 </div>
               </div>
 
               {/* Right: Windows ─ □ × */}
-              <div className="flex items-stretch h-full" style={{ fontFamily: "var(--mono)", fontSize: "0.7rem" }}>
+              <div className="flex items-stretch h-full" style={{ fontFamily: "var(--mono)", fontSize: "0.65rem" }}>
                 <button
-                  className="px-4 py-2.5 hover:bg-[#21262D] transition-colors select-none"
+                  className="px-3.5 py-2.5 hover:bg-[#21262D] transition-colors select-none"
                   style={{ color: "var(--text-3)" }}
                   title="Minimize"
                   onClick={() => setIsOpen(false)}
                 >─</button>
                 <button
-                  className="px-4 py-2.5 hover:bg-[#21262D] transition-colors select-none"
+                  className="px-3.5 py-2.5 hover:bg-[#21262D] transition-colors select-none"
                   style={{ color: "var(--text-3)" }}
                   title="Maximize"
                 >□</button>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="px-4 py-2.5 hover:bg-[#F85149] hover:text-white transition-colors select-none"
+                  className="px-3.5 py-2.5 hover:bg-[#F85149] hover:text-white transition-colors select-none"
                   style={{ color: "var(--text-3)" }}
                   title="Close"
                 >✕</button>
@@ -142,39 +172,46 @@ export default function ChatWidget() {
 
             {/* Messages */}
             <div
-              className="flex-1 overflow-y-auto px-4 py-4 space-y-3 text-sm"
+              className="flex-1 overflow-y-auto px-4 py-4 space-y-3"
               style={{ background: "var(--bg2)" }}
             >
               {messages.map((msg, i) => (
                 <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                   {msg.role === "assistant" && (
                     <div
-                      className="w-6 h-6 mr-2 mt-0.5 rounded-md flex items-center justify-center text-[9px] font-bold flex-shrink-0 text-white"
-                      style={{ background: "var(--accent)" }}
+                      className="w-5 h-5 mr-2 mt-0.5 rounded-sm flex items-center justify-center text-[8px] font-bold flex-shrink-0"
+                      style={{
+                        background: "rgba(99,102,241,0.15)",
+                        border: "1px solid rgba(99,102,241,0.30)",
+                        color: "var(--accent)",
+                        fontFamily: "var(--mono)",
+                      }}
                     >
                       AI
                     </div>
                   )}
                   <div
-                    className="max-w-[85%] px-3.5 py-2.5 rounded-md whitespace-pre-wrap leading-relaxed text-xs"
+                    className="max-w-[85%] px-3.5 py-2.5 rounded-md text-xs whitespace-pre-wrap leading-relaxed"
                     style={
                       msg.role === "user"
                         ? {
-                          background: "var(--accent)",
-                          color: "#fff",
+                          background: "rgba(99,102,241,0.20)",
+                          border: "1px solid rgba(99,102,241,0.30)",
+                          color: "var(--text)",
                           borderRadius: "8px 8px 2px 8px",
                         }
                         : {
                           background: "var(--surface)",
                           border: "1px solid var(--border)",
-                          color: "var(--text)",
+                          color: "var(--text-2)",
                           fontFamily: "var(--mono)",
                           borderRadius: "2px 8px 8px 8px",
+                          lineHeight: 1.65,
                         }
                     }
                   >
                     {msg.role === "assistant" && (
-                      <span style={{ color: "var(--green)" }}>{">"} </span>
+                      <span style={{ color: "var(--accent)", marginRight: 4 }}>{">"}</span>
                     )}
                     {msg.content}
                   </div>
@@ -184,8 +221,13 @@ export default function ChatWidget() {
               {loading && (
                 <div className="flex items-center gap-2">
                   <div
-                    className="w-6 h-6 rounded-md flex items-center justify-center text-[9px] font-bold text-white"
-                    style={{ background: "var(--accent)" }}
+                    className="w-5 h-5 rounded-sm flex items-center justify-center text-[8px] font-bold flex-shrink-0"
+                    style={{
+                      background: "rgba(99,102,241,0.15)",
+                      border: "1px solid rgba(99,102,241,0.30)",
+                      color: "var(--accent)",
+                      fontFamily: "var(--mono)",
+                    }}
                   >AI</div>
                   <div
                     className="px-3.5 py-2.5 rounded-md flex gap-1.5"
@@ -213,7 +255,7 @@ export default function ChatWidget() {
                 className="flex items-center gap-2 rounded-md px-3 py-2"
                 style={{ background: "var(--bg2)", border: "1px solid var(--border)" }}
               >
-                <span style={{ fontFamily: "var(--mono)", color: "var(--accent)", fontSize: "0.7rem", flexShrink: 0 }}>PS&gt;</span>
+                <span style={{ fontFamily: "var(--mono)", color: "var(--accent)", fontSize: "0.65rem", flexShrink: 0 }}>PS&gt;</span>
                 <input
                   ref={inputRef}
                   value={input}
@@ -226,13 +268,17 @@ export default function ChatWidget() {
                 <button
                   onClick={sendMessage}
                   disabled={!input.trim() || loading}
-                  className="w-7 h-7 rounded-md flex items-center justify-center text-white disabled:opacity-30 transition-transform hover:scale-105"
-                  style={{ background: "var(--accent)" }}
+                  className="w-6 h-6 rounded-md flex items-center justify-center disabled:opacity-25 transition-opacity"
+                  style={{
+                    background: "rgba(99,102,241,0.15)",
+                    border: "1px solid rgba(99,102,241,0.30)",
+                    color: "var(--accent)",
+                  }}
                 >
-                  <Send size={13} />
+                  <Send size={11} />
                 </button>
               </div>
-              <p className="text-center text-[10px] mt-1.5" style={{ fontFamily: "var(--mono)", color: "var(--text-3)" }}>
+              <p className="text-center text-[9px] mt-1.5" style={{ fontFamily: "var(--mono)", color: "var(--text-3)" }}>
                 powered by groqcloud
               </p>
             </div>
@@ -241,4 +287,7 @@ export default function ChatWidget() {
       </AnimatePresence>
     </div>
   );
-}
+});
+
+ChatWidget.displayName = "ChatWidget";
+export default ChatWidget;
