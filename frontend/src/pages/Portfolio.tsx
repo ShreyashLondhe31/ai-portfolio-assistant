@@ -271,7 +271,7 @@ const perfMetrics = [
     { label: "db_upgrade_path", value: "SQLite → PG", desc: "Structured migration path documented; schema designed for both runtimes" },
     { label: "bundle_strategy", value: "code-split", desc: "Vite code-splitting per route; GSAP / Framer loaded lazily" },
     { label: "scroll_animations", value: "once: true", desc: "ScrollTrigger plays once — no rewind on scroll-up for consistent 60fps" },
-    { label: "render_hosting", value: "cold-start aware", desc: "Backend on Render free tier; retry logic built into the frontend fetch" },
+    { label: "backend_hosting", value: "railway", desc: "Backend deployed on Railway; retry logic built into the frontend fetch" },
 ];
 
 
