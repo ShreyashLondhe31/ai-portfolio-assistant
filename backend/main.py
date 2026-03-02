@@ -54,12 +54,17 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
 app.add_middleware(SecurityHeadersMiddleware)
 
+# ---------------- HEALTH CHECK ----------------
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
 # ---------------- MODELS ----------------
 class ChatRequest(BaseModel):
     message: str
 
 # ---------------- CHAT ----------------
-@app.post("/chat")
+@app.post("/api/chat")
 @limiter.limit("10/minute")
 def chat(request: Request, req: ChatRequest):
     user_message = req.message.strip().lower()
@@ -83,7 +88,7 @@ def chat(request: Request, req: ChatRequest):
     return {"reply": reply_text}
 
 # ---------------- GET MESSAGES ----------------
-@app.get("/messages")
+@app.get("/api/messages")
 @limiter.limit("30/minute")
 def get_messages(request: Request):
     conn = get_connection()
