@@ -25,7 +25,7 @@ def init_db():
         )
     """)
 
-        # CACHE TABLE
+    # CACHE TABLE
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS ai_cache (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -33,6 +33,9 @@ def init_db():
         ai_reply TEXT
     )
     """)
+
+    # Clear entire cache on every startup so stale replies never persist across deployments
+    cursor.execute("DELETE FROM ai_cache")
 
     conn.commit()
     conn.close()
@@ -50,6 +53,7 @@ def save_message(role, content):
     conn.commit()
     conn.close()
 
+
 def get_cached_reply(message: str):
     conn = get_connection()
     cursor = conn.cursor()
@@ -62,6 +66,10 @@ def get_cached_reply(message: str):
 
 
 def save_cache(message: str, reply: str):
+    # Never cache "not listed" or "not aware" replies — they may be stale/incorrect
+    if "not listed" in reply.lower() or "not aware" in reply.lower():
+        return
+
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -70,5 +78,13 @@ def save_cache(message: str, reply: str):
         (message, reply)
     )
 
+    conn.commit()
+    conn.close()
+
+
+def clear_cache():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM ai_cache")
     conn.commit()
     conn.close()

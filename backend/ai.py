@@ -8,13 +8,15 @@ load_dotenv()
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-# -------- LOAD RESUME --------
-with open("resume.json", "r", encoding="utf-8") as f:
-    resume_data = json.load(f)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+RESUME_PATH = os.path.join(BASE_DIR, "resume.json")
 
-RESUME_CONTEXT = json.dumps(resume_data, indent=2)
-
-SYSTEM_PROMPT = f"""
+# -------- LOAD RESUME (fresh on every request so new resume.json is always used) --------
+def _build_system_prompt() -> str:
+    with open(RESUME_PATH, "r", encoding="utf-8") as f:
+        resume_data = json.load(f)
+    resume_context = json.dumps(resume_data, indent=2)
+    return f"""
 You are Shreyash Londhe's professional AI portfolio assistant.
 
 Your job is to speak like a polished, recruiter-facing assistant.
@@ -39,7 +41,7 @@ TONE:
 Professional, concise, confident, recruiter-friendly.
 
 RESUME DATA:
-{RESUME_CONTEXT}
+{resume_context}
 """
 
 CACHE = {}
@@ -61,25 +63,27 @@ def set_cache(key: str, value: str):
 def get_ai_response(user_message: str):
     normalized = user_message.strip().lower()
 
-    # CHECK CACHE
+    # CHECK IN-MEMORY CACHE
     cached = get_cached(normalized)
     if cached:
         return {"reply": cached}
 
     try:
+        system_prompt = _build_system_prompt()
         completion = client.chat.completions.create(
             model="llama-3.1-8b-instant",
             temperature=0.2,
             messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message}
             ]
         )
 
         reply = completion.choices[0].message.content.strip()
 
-        # SAVE CACHE
-        set_cache(normalized, reply)
+        # Only cache valid (non-"not listed") replies
+        if "not listed" not in reply.lower() and "not aware" not in reply.lower():
+            set_cache(normalized, reply)
 
         return {"reply": reply}
 
