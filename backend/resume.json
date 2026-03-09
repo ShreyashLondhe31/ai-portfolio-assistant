@@ -6,36 +6,148 @@
     "cgpa": "9.00"
   },
   "skills": {
-    "frontend": ["React", "TypeScript", "TailwindCSS"],
-    "backend": ["Python", "FastAPI", "RestAPI", "Django", "DjangoRestFramework", "Node.js"],
-    "database": ["Postgres", "MySQL", "MongoDB"],
-    "other": ["Git", "REST APIs", "AI Integration", "OpenRouter API"]
+    "frontend": ["React", "TypeScript", "TailwindCSS", "Framer Motion", "GSAP"],
+    "backend": [
+      "Python",
+      "FastAPI",
+      "REST API",
+      "Django",
+      "DjangoRestFramework",
+      "Node.js",
+      "Express.js"
+    ],
+    "database": ["PostgreSQL", "MySQL", "MongoDB", "Mongoose", "SQLite"],
+    "devtools": [
+      "Git",
+      "Vite",
+      "Multer",
+      "Axios",
+      "Zustand",
+      "WebSockets",
+      "Intersection Observer API"
+    ],
+    "cloud_and_media": ["Cloudinary", "Render", "Railway"],
+    "ai_and_llm": [
+      "OpenRouter API",
+      "GroqCloud",
+      "LLM Integration",
+      "Prompt Engineering",
+      "RAG"
+    ],
+    "languages": ["JavaScript", "TypeScript", "Python", "C++"],
+    "other": [
+      "JWT Authentication",
+      "bcryptjs",
+      "SDL3",
+      "Isometric Rendering",
+      "CSV I/O"
+    ]
   },
   "projects": [
     {
       "name": "AI Portfolio Assistant",
-      "description": "Full stack AI-powered portfolio using React, TypeScript, FastAPI and OpenRouter.",
+      "description": "Production-ready full-stack portfolio with a resume-aware AI chatbot powered by FastAPI and GroqCloud. The backend injects structured resume context into every LLM prompt server-side, keeping API keys and personal data off the client. SQLite persists chat messages across sessions.",
+      "tech_stack": [
+        "React",
+        "TypeScript",
+        "FastAPI",
+        "Python",
+        "GroqCloud",
+        "OpenRouter",
+        "SQLite",
+        "Tailwind CSS"
+      ],
       "features": [
-        "Chat interface with AI",
-        "Backend context-based responses",
-        "Deployed full-stack architecture"
+        "Resume-aware AI chat — GroqCloud LLM answers recruiter questions using structured server-side context injection",
+        "FastAPI backend with SQLite message persistence and CORS-safe REST endpoints",
+        "Floating chat widget with typing indicators and Framer Motion transitions",
+        "API keys and resume data never exposed to the client",
+        "Backend deployed on Render; full-stack production architecture"
       ]
     },
     {
       "name": "Hakimi Establishment Website",
-      "description": "Business website with modern UI and responsive design.",
+      "description": "Performance-optimised React e-commerce frontend with three-tier lazy loading — React.lazy code splitting, Intersection Observer-driven API calls via a custom useIntersectionTrigger hook, and LazyImage media lazy loading. Initial load time reduced by 66% (1.5s to 0.5s) and initial data transfer reduced by 67% (150 KB to 50 KB).",
+      "tech_stack": [
+        "React",
+        "JavaScript",
+        "Tailwind CSS",
+        "Zustand",
+        "Axios",
+        "Intersection Observer API",
+        "WebSockets",
+        "Framer Motion"
+      ],
       "features": [
-        "Responsive layout",
-        "Professional UI design",
-        "Client-oriented development"
+        "Three-tier lazy loading: code splitting (React.lazy) + API lazy loading (useIntersectionTrigger) + media lazy loading (LazyImage)",
+        "Custom useIntersectionTrigger hook defers products API call until scroll — 66% faster initial load",
+        "ProductSkeleton with CSS pulse animation shows 5 placeholder cards during fetch — zero layout shift",
+        "Two-flag state pattern (loadingProducts / productsLoaded) prevents re-fetches and skeleton flicker",
+        "Zustand global cart state; useAdminSocket WebSocket hook for live admin order updates",
+        "Fully responsive grid: 2-column mobile, 3-column tablet, 5-column desktop"
+      ]
+    },
+    {
+      "name": "AuraStream",
+      "description": "Production-grade Netflix-inspired MERN streaming platform. Supports up to 5 independent profiles per user account, each with isolated search history, continue-watching progress, and Cloudinary avatar images. A single JWT cookie carries both userId and profileId, scoping all data automatically. Content is fetched from the TMDB API through a shared service layer. Built on a fully modular Express 5 backend.",
+      "tech_stack": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "Express 5",
+        "MongoDB",
+        "Mongoose",
+        "JWT",
+        "Cloudinary",
+        "Multer",
+        "TMDB API",
+        "bcryptjs"
+      ],
+      "github": "https://github.com/ShreyashLondhe31/AuraStream",
+      "features": [
+        "Multi-profile system: up to 5 profiles per account, each fully isolated by profileId in every DB query",
+        "Single JWT cookie carries both userId and profileId — /switchprofile endpoint regenerates token instantly",
+        "TMDB integration: trending, trailers, details, similar titles, and categories via a shared fetchFromTMDB service",
+        "Per-profile continue-watching: currentTime, season, episode, and totalDuration persisted in MongoDB",
+        "Cloudinary image pipeline: Multer memory-buffers upload → base64 data URI → streams to Cloudinary (zero disk I/O)",
+        "Modular Express 5 architecture: routes → controllers → models → middleware, no business logic in route files",
+        "Per-profile search history with atomic $push / $pull and indexed profileId for fast filtering",
+        "bcryptjs hashing (salt rounds = 10), HTTP-only SameSite-strict secure-in-prod JWT cookies"
+      ]
+    },
+    {
+      "name": "Osiris Level Editor",
+      "type": "Team Collaboration Project",
+      "description": "Feature-complete isometric tile-based level editor built in C++ with SDL3. Implements a full bidirectional isometric coordinate projection system, a 6-layer scene graph with per-layer visibility and alpha blending, per-tile scale storage, a pixel-accurate collider editor, and a CSV save/load pipeline that outputs data directly consumable by a game engine.",
+      "tech_stack": [
+        "C++",
+        "SDL3",
+        "SDL3_ttf",
+        "SDL3_image",
+        "Isometric Rendering",
+        "CSV I/O",
+        "CMake"
+      ],
+      "github": "https://github.com/RohitAkulwar380/level-editor-SDL3-osiris",
+      "features": [
+        "Bidirectional isometric projection: cartesian ↔ screen coordinate conversion with zoom (0.5x–3x) and right-click pan",
+        "6-layer system (Terrain, Player, Furniture, Enemy, NPCs, Portal) with per-layer visibility toggling and alpha compositing",
+        "Per-tile scale factor stored per cell; global brush scale adjusted live with [ / ] hotkeys",
+        "Pixel-accurate collider editor: click-to-set per-edge offsets (T/B/L/R) with red bounding box overlay",
+        "CSV pipeline: tile IDs, scale values, collider data, and level metadata all round-trip through flat CSV files",
+        "Dynamic tile loader: scans asset directory at startup, tolerates up to 20 consecutive missing tile IDs",
+        "Smooth tile-snap camera: Space key lerps viewport to nearest isometric tile center via SNAP_SPEED interpolation",
+        "Multi-level workflow: Ctrl+N/D to add/delete levels, arrow keys to switch, Ctrl+S saves all levels"
       ]
     }
   ],
   "strengths": [
-    "Strong problem solving",
-    "Clean backend architecture design",
-    "Focus on scalable systems",
-    "Interest in AI-powered applications"
+    "Strong problem solving and algorithmic thinking",
+    "Clean backend architecture design with separation of concerns",
+    "Focus on scalable, maintainable systems",
+    "Performance engineering — measurable optimisation with real metrics",
+    "Experience with AI-powered application development",
+    "Comfortable working in team codebases (collaborative C++ project)"
   ],
   "hobbies": [
     {
@@ -51,5 +163,5 @@
       "description": "Engage in PC gaming as a recreational activity that enhances strategic planning, reaction time, and problem-solving skills."
     }
   ],
-  "career_goal": "To become a strong full-stack engineer specializing in AI-powered applications and scalable backend systems."
+  "career_goal": "To become a strong full-stack engineer specializing in AI-powered applications, scalable backend systems, and production-grade architecture."
 }

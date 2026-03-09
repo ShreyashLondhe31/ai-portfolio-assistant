@@ -49,7 +49,6 @@ export default function TopIntroBar() {
                     <Stat icon={<Code2 size={13} />} label="projects_built" value="4" />
                     <Stat icon={<Wifi size={13} />} label="intern_ready" value="2026" />
                 </div>
-
             </div>
         </div>
     );
