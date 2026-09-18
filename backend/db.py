@@ -66,8 +66,9 @@ def get_cached_reply(message: str):
 
 
 def save_cache(message: str, reply: str):
-    # Never cache "not listed" or "not aware" replies — they may be stale/incorrect
-    if "not listed" in reply.lower() or "not aware" in reply.lower():
+    # Never cache "not listed", "not aware", or error replies
+    lowered = reply.lower()
+    if "not listed" in lowered or "not aware" in lowered or "unavailable" in lowered or "error" in lowered:
         return
 
     conn = get_connection()

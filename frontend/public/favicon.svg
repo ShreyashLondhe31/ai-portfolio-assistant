@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#030712"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Rounded Base -->
+  <rect width="32" height="32" rx="7" fill="url(#bgGrad)" stroke="#1f2937" stroke-width="1"/>
+
+  <!-- Shield Contour -->
+  <path d="M16 4.5 L24 7.8 C24 16 19.5 22 16 26.5 C12.5 22 8 16 8 7.8 Z" 
+        fill="none" 
+        stroke="url(#shieldGrad)" 
+        stroke-width="1.8" 
+        stroke-linejoin="round"
+        stroke-linecap="round"/>
+
+  <!-- Monogram 'S' -->
+  <path d="M18.8 11.2 C18.2 10.4 17.2 9.9 16 9.9 C14.3 9.9 13.2 10.9 13.2 12.2 C13.2 13.6 14.2 14.3 15.6 14.8 L16.4 15.1 C18 15.6 19.2 16.5 19.2 18 C19.2 19.6 17.8 20.8 16 20.8 C14.4 20.8 13.2 20.1 12.6 19.2" 
+        fill="none" 
+        stroke="#ffffff" 
+        stroke-width="1.9" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
+</svg>

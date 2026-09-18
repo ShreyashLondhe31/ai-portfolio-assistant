@@ -1,6 +1,7 @@
+import os
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from ai import get_ai_response
 from db import init_db, save_message, get_connection
 
@@ -30,16 +31,22 @@ def rate_limit_handler(request: Request, exc: RateLimitExceeded):
 
 # ---------- CORS ----------
 origins = [
-    "http://localhost:5173",
     "https://ai-portfolio-assistant-peach.vercel.app",
+    "http://localhost:5173"
 ]
+
+# Allow custom production origins from environment variable
+env_origins = os.getenv("CORS_ORIGINS", "")
+if env_origins:
+    origins.extend([o.strip() for o in env_origins.split(",") if o.strip()])
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=r"https://.*\.vercel\.app|http://localhost:\d+",
     allow_credentials=True,
-    allow_methods=["GET", "POST"],
-    allow_headers=["Content-Type"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["*"],
 )
 
 # ---------- SECURITY HEADERS ----------
@@ -61,7 +68,7 @@ def health_check():
 
 # ---------------- MODELS ----------------
 class ChatRequest(BaseModel):
-    message: str
+    message: str = Field(..., min_length=1, max_length=1000)
 
 # ---------------- CHAT ----------------
 @app.post("/api/chat")
@@ -86,15 +93,3 @@ def chat(request: Request, req: ChatRequest):
     save_message("assistant", reply_text)
 
     return {"reply": reply_text}
-
-# ---------------- GET MESSAGES ----------------
-@app.get("/api/messages")
-@limiter.limit("30/minute")
-def get_messages(request: Request):
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM messages ORDER BY id DESC LIMIT 50")
-    rows = cursor.fetchall()
-    conn.close()
-
-    return [dict(row) for row in rows]
